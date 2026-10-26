@@ -14,7 +14,8 @@
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; }
+html, body { margin: 0; }
+body { min-height: 100vh; }
 body {
   background: var(--bg); color: var(--text);
   font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
@@ -46,7 +47,7 @@ h3 { font-size: 15px; margin-bottom: 6px; }
 .row.center { justify-content: center; gap: 10px; }
 
 /* Navigation */
-.nav { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 18px 12px; gap: 18px; height: 100vh; position: sticky; top: 0; }
+.nav { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 18px 12px; gap: 18px; height: 100vh; position: sticky; top: 0; align-self: start; overflow-y: auto; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 16px; padding: 0 8px; }
 .brand img { width: 28px; height: 28px; }
 .nav nav { display: flex; flex-direction: column; gap: 4px; }
@@ -193,3 +194,14 @@ summary { cursor: pointer; color: var(--accent); }
 [hidden] { display: none !important; }
 .grid2 > *, .minilist > * { min-width: 0; }
 .switch { flex: none; }
+
+/* Carte sponsorisée Zen Home */
+.sponsor { margin-top: auto; border-radius: var(--radius); overflow: hidden; background: var(--panel2); border: 1px solid var(--line); }
+.sponsor img { display: block; width: 100%; aspect-ratio: 16/8; object-fit: cover; }
+.sponsor .body { padding: 10px 12px 12px; display: grid; gap: 6px; }
+.sponsor .tag { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.sponsor strong { font-size: 14px; }
+.sponsor p { margin: 0; font-size: 12.5px; color: var(--muted); }
+.sponsor button { width: 100%; }
+.nav .device { margin-top: 0; }
+@media (max-width: 900px) { .sponsor { display: none; } }

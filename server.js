@@ -595,6 +595,37 @@ async function installApk(req) {
   }
 }
 
+// ---------------------------------------------------------------- Zen Home (sister project)
+
+const ZEN_HOME_APK = 'https://github.com/Hoax017/zen-tv/releases/latest/download/zen-home.apk';
+const ZEN_HOME_SERVICE = `${ZEN_HOME}/${ZEN_HOME}.HomeKeyService`;
+
+async function installZenHome(force) {
+  const res = await fetch(ZEN_HOME_APK);
+  if (!res.ok) throw httpError(502, `download failed (${res.status})`);
+  const tmp = path.join(os.tmpdir(), `zen-home-${crypto.randomUUID()}.apk`);
+  fs.writeFileSync(tmp, Buffer.from(await res.arrayBuffer()));
+  try {
+    const had = await hasPackage(ZEN_HOME);
+    let r = await adb(['install', '-r', tmp], { timeout: 300000 });
+    let out = `${r.stdout}${r.stderr}`;
+    if (/UPDATE_INCOMPATIBLE/.test(out)) {
+      // Another build of Zen Home: replacing it resets its dock, so the user decides.
+      if (!force) throw httpError(409, 'signature');
+      await sh(`pm uninstall ${ZEN_HOME}`);
+      r = await adb(['install', tmp], { timeout: 300000 });
+      out = `${r.stdout}${r.stderr}`;
+    }
+    if (!/Success/.test(out)) throw httpError(500, out.trim().split('\n').pop());
+    if (!had) record({ kind: 'install', pkg: ZEN_HOME, label: 'Zen Home' });
+    await setAccessibility(ZEN_HOME_SERVICE, true);
+    await sh(`am start -n ${ZEN_HOME}/.HomeActivity`);
+    return { ok: true };
+  } finally {
+    fs.rmSync(tmp, { force: true });
+  }
+}
+
 // ---------------------------------------------------------------- HTTP
 
 function httpError(status, message) { const e = new Error(message); e.status = status; return e; }
@@ -639,6 +670,8 @@ const routes = {
   'GET /api/screen': async () => { needDevice(); const png = await screenshot(); if (!png) throw httpError(503, 'no screenshot'); return { __raw: png, type: 'image/png' }; },
   'POST /api/install': async (req) => { needDevice(); return installApk(req); },
   'POST /api/reboot': async () => { needDevice(); await adb(['reboot']); return { ok: true }; },
+  'POST /api/zenhome/install': async (req) => { needDevice(); return installZenHome(!!(await body(req)).force); },
+  'POST /api/zenhome/open': async () => { needDevice(); await sh(`am start -n ${ZEN_HOME}/.HomeActivity`); return { ok: true }; },
   'POST /api/quit': async () => { setTimeout(() => process.exit(0), 300); return { ok: true }; },
   'GET /api/device': async () => {
     needDevice();

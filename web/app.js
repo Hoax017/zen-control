@@ -4,7 +4,7 @@ const I18N = {
   fr: {
     'nav.apps': 'Applis', 'nav.remote': 'Télécommande', 'nav.privacy': 'Pubs & traceurs', 'nav.settings': 'Réglages',
     'nav.install': 'Installer un APK', 'nav.journal': 'Journal',
-    'tv.switch': 'Changer de télé', 'app.quit': 'Quitter Zen Control', 'app.quitConfirm': 'Quitter Zen Control ? Tu pourras le relancer depuis tes applications.', 'app.closed': 'Zen Control est fermé. Tu peux fermer cet onglet.', 'tv.unknown': 'Appareil Android, pas encore connecté', 'tv.none': 'Pas de télé', 'tv.pending': 'En attente d\'autorisation',
+    'tv.switch': 'Changer de télé', 'app.quit': 'Quitter Zen Control', 'sp.tag': 'Sponsorisé', 'sp.text': 'L\'écran d\'accueil façon Apple TV : dock de tes applis et paysages qui suivent l\'heure du jour.', 'sp.install': 'Installer sur la télé', 'sp.open': 'Ouvrir sur la télé', 'sp.installing': 'Installation…', 'sp.signature': 'Une autre version de Zen Home est installée. La remplacer ? L\'ordre de son dock sera réinitialisé.', 'sp.done': 'Zen Home est installé ✔ La touche Accueil l\'ouvre maintenant.', 'app.quitConfirm': 'Quitter Zen Control ? Tu pourras le relancer depuis tes applications.', 'app.closed': 'Zen Control est fermé. Tu peux fermer cet onglet.', 'tv.unknown': 'Appareil Android, pas encore connecté', 'tv.none': 'Pas de télé', 'tv.pending': 'En attente d\'autorisation',
     'connect.title': 'Connecte ta télé', 'connect.intro': 'La télé et cet ordinateur doivent être sur le même réseau, avec le débogage activé sur la télé.',
     'connect.found': 'Télés trouvées sur le réseau', 'connect.rescan': 'Rechercher', 'connect.ip': 'Adresse IP de la télé',
     'connect.button': 'Se connecter', 'connect.scanning': 'Recherche en cours…', 'connect.none': 'Aucune télé trouvée automatiquement. Tape son adresse IP ci-dessous.',
@@ -56,7 +56,7 @@ const I18N = {
   },
   en: {
     'nav.apps': 'Apps', 'nav.remote': 'Remote', 'nav.privacy': 'Ads & trackers', 'nav.settings': 'Settings', 'nav.install': 'Install an APK', 'nav.journal': 'Journal',
-    'tv.switch': 'Switch TV', 'app.quit': 'Quit Zen Control', 'app.quitConfirm': 'Quit Zen Control? You can start it again from your applications.', 'app.closed': 'Zen Control is closed. You can close this tab.', 'tv.unknown': 'Android device, not connected yet', 'tv.none': 'No TV', 'tv.pending': 'Waiting for approval',
+    'tv.switch': 'Switch TV', 'app.quit': 'Quit Zen Control', 'sp.tag': 'Sponsored', 'sp.text': 'An Apple TV–style home screen: a dock of your apps and landscapes that follow the time of day.', 'sp.install': 'Install on the TV', 'sp.open': 'Open on the TV', 'sp.installing': 'Installing…', 'sp.signature': 'Another build of Zen Home is installed. Replace it? Its dock order will reset.', 'sp.done': 'Zen Home is installed ✔ The Home button now opens it.', 'app.quitConfirm': 'Quit Zen Control? You can start it again from your applications.', 'app.closed': 'Zen Control is closed. You can close this tab.', 'tv.unknown': 'Android device, not connected yet', 'tv.none': 'No TV', 'tv.pending': 'Waiting for approval',
     'connect.title': 'Connect your TV', 'connect.intro': 'The TV and this computer must be on the same network, with debugging turned on on the TV.',
     'connect.found': 'TVs found on your network', 'connect.rescan': 'Search', 'connect.ip': 'TV IP address', 'connect.button': 'Connect',
     'connect.scanning': 'Searching…', 'connect.none': 'No TV found automatically. Type its IP address below.',
@@ -168,11 +168,28 @@ async function refreshStatus() {
   $('#deviceName').textContent = s.connected ? `${s.device.manufacturer} ${s.device.model}` : (s.pending ? t('tv.pending') : t('tv.none'));
   $('#deviceSub').textContent = s.connected ? `Android ${s.device.android} · ${s.serial}` : '';
   $('#adbMissing').hidden = s.adb !== false;
+  $('#sponsor').hidden = !s.connected;
+  $('#sponsorBtn').textContent = s.zenHome ? t('sp.open') : t('sp.install');
   $('#connectCard').hidden = s.adb === false;
   return s;
 }
 
 $('#switchTv').addEventListener('click', () => { show('connect'); scanTvs(); });
+$('#sponsorBtn').addEventListener('click', async e => {
+  const btn = e.currentTarget;
+  if (S.status?.zenHome) return act(() => api('/api/zenhome/open', { method: 'POST' }), null).catch(() => {});
+  btn.disabled = true; btn.innerHTML = `<span class="spinner"></span> ${t('sp.installing')}`;
+  try {
+    try { await api('/api/zenhome/install', { method: 'POST', body: {} }); }
+    catch (err) {
+      if (err.message !== 'signature' || !confirm(t('sp.signature'))) throw err;
+      await api('/api/zenhome/install', { method: 'POST', body: { force: true } });
+    }
+    toast(t('sp.done')); refreshJournalCount();
+  } catch (err) { toast(t('error', { e: err.message }), true); }
+  btn.disabled = false;
+  await refreshStatus();
+});
 $('#quitApp').addEventListener('click', async () => {
   if (!confirm(t('app.quitConfirm'))) return;
   await api('/api/quit', { method: 'POST' }).catch(() => {});
