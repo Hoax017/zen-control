@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zen Control</title>
+  <link rel="icon" href="icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside class="nav">
+    <div class="brand"><img src="icon.svg" alt=""><span>Zen Control</span></div>
+    <nav>
+      <button data-view="apps" class="active"><svg viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg><span data-t="nav.apps"></span></button>
+      <button data-view="remote"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg><span data-t="nav.remote"></span></button>
+      <button data-view="privacy"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span data-t="nav.privacy"></span></button>
+      <button data-view="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-t="nav.settings"></span></button>
+      <button data-view="install"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg><span data-t="nav.install"></span></button>
+      <button data-view="journal"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg><span data-t="nav.journal"></span><b id="journalCount" class="count" hidden></b></button>
+    </nav>
+    <div class="device" id="deviceBox">
+      <span class="dot" id="dot"></span>
+      <div><strong id="deviceName">—</strong><small id="deviceSub"></small></div>
+      <button class="ghost small" id="switchTv" data-t="tv.switch"></button>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Connexion -->
+    <section id="view-connect" class="view">
+      <div class="hero">
+        <h1 data-t="connect.title"></h1>
+        <p class="muted" data-t="connect.intro"></p>
+      </div>
+      <div class="card" id="adbMissing" hidden>
+        <h3 data-t="adb.missing"></h3>
+        <p class="muted" data-t="adb.explain"></p>
+        <button class="primary" id="downloadAdb" data-t="adb.download"></button>
+      </div>
+      <div class="card" id="connectCard">
+        <div class="row between"><h3 data-t="connect.found"></h3><button class="ghost" id="rescan" data-t="connect.rescan"></button></div>
+        <div id="tvList" class="tvlist"></div>
+        <div class="row gap">
+          <input id="manualIp" placeholder="192.168.1.42" data-tp="connect.ip">
+          <button class="primary" id="manualConnect" data-t="connect.button"></button>
+        </div>
+        <details>
+          <summary data-t="connect.pairTitle"></summary>
+          <p class="muted" data-t="connect.pairHelp"></p>
+          <div class="row gap">
+            <input id="pairAddr" placeholder="192.168.1.42:37123">
+            <input id="pairCode" placeholder="123456" maxlength="6" class="short">
+            <button id="pairBtn" data-t="connect.pair"></button>
+          </div>
+        </details>
+        <details>
+          <summary data-t="connect.helpTitle"></summary>
+          <ol class="muted" data-t-html="connect.help"></ol>
+        </details>
+      </div>
+    </section>
+
+    <!-- Applis -->
+    <section id="view-apps" class="view">
+      <header class="bar">
+        <h2 data-t="nav.apps"></h2>
+        <input id="search" type="search" data-tp="apps.search">
+      </header>
+      <div class="chips" id="filters"></div>
+      <div class="banner" id="helperBanner" hidden>
+        <span data-t="helper.explain"></span>
+        <button class="primary small" id="installHelper" data-t="helper.install"></button>
+      </div>
+      <div class="bulk" id="bulkBar" hidden>
+        <span id="bulkCount"></span>
+        <button class="small" data-bulk="disable" data-t="act.disable"></button>
+        <button class="small" data-bulk="enable" data-t="act.enable"></button>
+        <button class="small" data-bulk="suspend" data-t="act.suspend"></button>
+        <button class="small ghost" id="bulkClear" data-t="act.clearSel"></button>
+      </div>
+      <div id="appList" class="applist"></div>
+    </section>
+
+    <!-- Télécommande -->
+    <section id="view-remote" class="view">
+      <header class="bar"><h2 data-t="nav.remote"></h2>
+        <label class="switch"><input type="checkbox" id="liveToggle" checked><span></span><em data-t="remote.live"></em></label>
+      </header>
+      <div class="remote">
+        <div class="screen"><img id="screenImg" alt=""><div class="hint" data-t="remote.drm"></div></div>
+        <div class="pad">
+          <div class="row center"><button data-key="power" class="round danger" title="Power">⏻</button><button data-key="input" class="round" data-tt="remote.input">⇥</button><button data-key="settings" class="round" data-tt="nav.settings">⚙</button></div>
+          <div class="dpad">
+            <button data-key="up" class="up">▲</button><button data-key="left" class="left">◀</button>
+            <button data-key="ok" class="ok">OK</button>
+            <button data-key="right" class="right">▶</button><button data-key="down" class="down">▼</button>
+          </div>
+          <div class="row center"><button data-key="back" class="round" data-tt="remote.back">↩</button><button data-key="home" class="round" data-tt="remote.home">⌂</button><button data-key="menu" class="round" data-tt="remote.menu">☰</button></div>
+          <div class="row center"><button data-key="voldown" class="round">🔉</button><button data-key="mute" class="round">🔇</button><button data-key="volup" class="round">🔊</button></div>
+          <div class="row center"><button data-key="rewind" class="round">⏪</button><button data-key="play" class="round">⏯</button><button data-key="forward" class="round">⏩</button></div>
+          <div class="row gap"><input id="typeText" data-tp="remote.type"><button id="sendText" data-t="remote.send"></button></div>
+          <p class="muted small" data-t="remote.keys"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pubs & traceurs -->
+    <section id="view-privacy" class="view">
+      <header class="bar"><h2 data-t="nav.privacy"></h2></header>
+      <div class="card">
+        <h3 data-t="dns.title"></h3>
+        <p class="muted" data-t="dns.explain"></p>
+        <div id="dnsOptions" class="options"></div>
+        <div class="row gap"><input id="dnsCustom" placeholder="dns.example.com" disabled><button class="primary" id="dnsApply" data-t="act.apply"></button></div>
+        <p class="muted small" id="dnsCurrent"></p>
+      </div>
+      <div class="card">
+        <div class="row between"><h3 data-t="trackers.title"></h3><button class="primary" id="trackersAll" data-t="trackers.all"></button></div>
+        <p class="muted" data-t="trackers.explain"></p>
+        <div id="trackerList" class="minilist"></div>
+      </div>
+      <div class="card">
+        <h3 data-t="bg.title"></h3>
+        <p class="muted" data-t="bg.explain"></p>
+        <div id="bgList" class="minilist"></div>
+      </div>
+      <div class="card">
+        <h3 data-t="adid.title"></h3>
+        <p class="muted" data-t="adid.explain"></p>
+      </div>
+    </section>
+
+    <!-- Réglages -->
+    <section id="view-settings" class="view">
+      <header class="bar"><h2 data-t="nav.settings"></h2></header>
+      <div class="grid2">
+        <div class="card">
+          <h3 data-t="set.speed"></h3>
+          <label class="field"><span data-t="set.anim"></span><select id="animSel"></select></label>
+        </div>
+        <div class="card">
+          <h3 data-t="set.sleep"></h3>
+          <label class="field"><span data-t="set.screenOff"></span><select id="screenOff"></select></label>
+          <label class="field"><span data-t="set.sleepTimeout"></span><select id="sleepTimeout"></select></label>
+          <label class="field row between"><span data-t="set.screensaver"></span><span class="switch"><input type="checkbox" id="screensaver"><span></span></span></label>
+        </div>
+        <div class="card">
+          <h3 data-t="set.home"></h3>
+          <p class="muted small" data-t="set.homeHelp"></p>
+          <div id="homeList" class="options"></div>
+        </div>
+        <div class="card">
+          <h3 data-t="set.a11y"></h3>
+          <p class="muted small" data-t="set.a11yHelp"></p>
+          <div id="a11yList" class="minilist"></div>
+        </div>
+        <div class="card">
+          <h3 data-t="set.device"></h3>
+          <dl id="deviceInfo" class="info"></dl>
+          <button class="danger" id="reboot" data-t="set.reboot"></button>
+        </div>
+        <div class="card">
+          <h3 data-t="set.advanced"></h3>
+          <p class="muted small" data-t="set.advancedHelp"></p>
+          <div class="row gap"><select id="rawNs"><option>global</option><option>secure</option><option>system</option></select><input id="rawSearch" type="search" data-tp="apps.search"></div>
+          <div id="rawList" class="rawlist"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installer -->
+    <section id="view-install" class="view">
+      <header class="bar"><h2 data-t="nav.install"></h2></header>
+      <label class="drop" id="drop">
+        <input type="file" id="apkFile" accept=".apk" hidden>
+        <svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
+        <strong data-t="install.drop"></strong>
+        <span class="muted" data-t="install.or"></span>
+      </label>
+      <p id="installStatus" class="muted"></p>
+    </section>
+
+    <!-- Journal -->
+    <section id="view-journal" class="view">
+      <header class="bar"><h2 data-t="nav.journal"></h2><button class="danger" id="undoAll" data-t="journal.undoAll"></button></header>
+      <p class="muted" data-t="journal.explain"></p>
+      <div id="journalList" class="journal"></div>
+    </section>
+  </main>
+
+  <!-- Détail d'une appli -->
+  <div class="drawer" id="drawer" hidden>
+    <div class="drawer-bg" data-close></div>
+    <div class="drawer-panel">
+      <button class="close ghost" data-close>✕</button>
+      <div id="drawerBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast" hidden></div>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

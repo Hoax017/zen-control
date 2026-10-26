@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zen.tvhelper">
+
+    <!-- Needed to read the names and icons of every app, including system ones. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <application android:label="@string/app_name" android:allowBackup="false" android:hasCode="true">
+        <!-- Readable only with android.permission.DUMP, which only adb (shell) and the system hold. -->
+        <provider
+            android:name=".AppsProvider"
+            android:authorities="com.zen.tvhelper.apps"
+            android:exported="true"
+            android:readPermission="android.permission.DUMP" />
+    </application>
+</manifest>

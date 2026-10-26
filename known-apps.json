@@ -1,0 +1,280 @@
+{
+ "apps": {
+  "com.google.android.feedback": {
+   "label": "Market Feedback Agent",
+   "desc": "Sends Play Store feedback and crash reports",
+   "tag": "telemetry",
+   "suspend": false,
+   "brand": "google"
+  },
+  "android.autoinstalls.config.google.gtvpai": {
+   "label": "Device configuration",
+   "desc": "Silently installs promoted apps on Google TV",
+   "tag": "ads",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.apps.nbu.smartconnect.tv": {
+   "label": "Data Saver",
+   "desc": "Google data-saver helper, useless on home Wi-Fi",
+   "tag": "junk",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.android.printspooler": {
+   "label": "Print spooler",
+   "desc": "Printing service, no printer on a TV",
+   "tag": "junk",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.katniss": {
+   "label": "Google Assistant",
+   "desc": "Voice search and the microphone button on the remote",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.apps.mediashell": {
+   "label": "Google Cast",
+   "desc": "Cast from your phone (YouTube, Netflix…) to the TV",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.tv.remote.service": {
+   "label": "Phone remote",
+   "desc": "Use the Google TV app on your phone as a remote",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.apps.tv.dreamx": {
+   "label": "Ambient mode",
+   "desc": "Google TV photo screensaver",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.backdrop": {
+   "label": "Ambient mode",
+   "desc": "Android TV photo screensaver",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.tvrecommendations": {
+   "label": "Home recommendations",
+   "desc": "Suggested content rows on the Android TV home screen",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.youtube.tvmusic": {
+   "label": "YouTube Music",
+   "desc": "YouTube Music app",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.videos": {
+   "label": "Google Play Movies",
+   "desc": "Movies and shows bought on Google",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.google.android.play.games": {
+   "label": "Google Play Games",
+   "desc": "Google Play Games app",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.amazon.amazonvideo.livingroom": {
+   "label": "Prime Video",
+   "desc": "Amazon Prime Video (preinstalled)",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.netflix.ninja": {
+   "label": "Netflix",
+   "desc": "Netflix (preinstalled)",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.disney.disneyplus": {
+   "label": "Disney+",
+   "desc": "Disney+ (preinstalled)",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "tv.wuaki.apptv": {
+   "label": "Rakuten TV",
+   "desc": "Rakuten TV (preinstalled)",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "au.com.stan.and": {
+   "label": "Stan",
+   "desc": "Stan (preinstalled)",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "google"
+  },
+  "com.tcl.waterfall.overseas": {
+   "label": "TCL Channel",
+   "desc": "Ad-supported channels and sponsored home rows",
+   "tag": "ads",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.partnercustomizer": {
+   "label": "TCL Channel (partners)",
+   "desc": "Partner ads and sponsored content",
+   "tag": "ads",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.esticker": {
+   "label": "Electronic card",
+   "desc": "Pop-up stickers and promotions",
+   "tag": "ads",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.messagebox": {
+   "label": "Message Box",
+   "desc": "TCL push messages and promotions",
+   "tag": "ads",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.notereminder": {
+   "label": "Reminder",
+   "desc": "TCL reminders and notifications",
+   "tag": "junk",
+   "suspend": true,
+   "brand": "tcl"
+  },
+  "com.tcl.usercenter": {
+   "label": "User Center",
+   "desc": "TCL account and usage data",
+   "tag": "telemetry",
+   "suspend": true,
+   "brand": "tcl"
+  },
+  "com.tcl.guard": {
+   "label": "Safety Guard",
+   "desc": "TCL \"cleaner\" running in the background",
+   "tag": "junk",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.hotelmenu": {
+   "label": "Hotel menu",
+   "desc": "Hotel mode, never used at home",
+   "tag": "junk",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.dashboard": {
+   "label": "TCL Home",
+   "desc": "TCL dashboard",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.assistant": {
+   "label": "T Assistant",
+   "desc": "TCL voice assistant",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.browser": {
+   "label": "BrowseHere",
+   "desc": "TCL web browser",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.miracast": {
+   "label": "Miracast",
+   "desc": "Mirror your phone's screen",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.MultiScreenInteraction_TV": {
+   "label": "MagiConnect",
+   "desc": "TCL phone app connection",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.ui_mediaCenter": {
+   "label": "Media Player",
+   "desc": "Play videos and music from a USB stick",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.gallery": {
+   "label": "Gallery",
+   "desc": "Photos from a USB stick",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.smartalexa": {
+   "label": "Alexa",
+   "desc": "Amazon Alexa built in",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  },
+  "com.tcl.micmanager": {
+   "label": "Far-field mic",
+   "desc": "Hands-free microphone",
+   "tag": "feature",
+   "suspend": false,
+   "brand": "tcl"
+  }
+ },
+ "protected": [
+  "android",
+  "com.android.systemui",
+  "com.android.settings",
+  "com.android.tv.settings",
+  "com.android.vending",
+  "com.android.shell",
+  "com.android.bluetooth",
+  "com.android.externalstorage",
+  "com.android.keychain",
+  "com.android.se",
+  "com.android.packageinstaller",
+  "com.android.permissioncontroller",
+  "com.google.android.gms",
+  "com.google.android.gsf",
+  "com.google.android.webview",
+  "com.android.webview",
+  "com.google.android.packageinstaller",
+  "com.google.android.permissioncontroller",
+  "com.google.android.ext.services",
+  "com.google.android.ext.shared",
+  "com.google.android.tungsten.setupwraith",
+  "com.google.android.apps.tv.launcherx",
+  "com.google.android.tvlauncher",
+  "com.google.android.leanbacklauncher",
+  "com.google.android.tv.frameworkpackagestubs",
+  "com.google.android.tv.assistant",
+  "com.zen.tvhome",
+  "com.tcl.tv",
+  "com.tcl.ttvs"
+ ]
+}

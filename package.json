@@ -1,0 +1,13 @@
+{
+  "name": "zen-control",
+  "version": "1.0.0",
+  "description": "Manage an Android TV / Google TV from your browser: apps, ads & trackers, remote, settings — every change can be undone.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.js",
+    "lan": "node server.js --lan"
+  }
+}

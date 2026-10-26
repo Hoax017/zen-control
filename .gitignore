@@ -1,0 +1,10 @@
+# Generated
+helper/build/
+dist/
+*.idsig
+node_modules/
+
+# Per user: TV backups/journal, downloaded adb
+data/
+tools/platform-tools/
+.DS_Store
