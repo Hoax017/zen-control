@@ -30,8 +30,10 @@ composants système essentiels sont verrouillés.
 2. **Télécharge** le zip de ton ordinateur depuis la [dernière version](https://github.com/Hoax017/zen-control/releases/latest)
    et dézippe-le.
 3. **Lance-le** :
-   - **Windows** : double-clic sur **`Zen Control.bat`** (si SmartScreen prévient : *Informations complémentaires → Exécuter quand même*).
-   - **Mac** : double-clic sur **`Zen Control.command`** (la première fois : clic droit → *Ouvrir*).
+   - **Windows** : double-clic sur **`Zen Control.bat`** (si SmartScreen prévient : *Informations complémentaires → Exécuter quand même*). *Pas encore testé sur un vrai PC Windows — retours bienvenus.*
+   - **Mac** : double-clic sur **`Zen Control.command`**. Le programme n'est pas signé par Apple : la première fois, macOS le bloque —
+     ouvre *Réglages Système → Confidentialité et sécurité* et clique **Ouvrir quand même**, ou lance une fois dans le Terminal :
+     `xattr -dr com.apple.quarantine ~/Downloads/zen-control-darwin-*` (adapte le chemin).
    - **Linux** : `./zen-control`
 4. Ton navigateur s'ouvre sur **http://localhost:8765**. Choisis ta télé, puis **accepte la fenêtre sur la télé**
    (*Autoriser le débogage USB ?* → coche *Toujours autoriser*).
@@ -49,7 +51,7 @@ téléphone (même Wi-Fi).
 - Le serveur n'écoute que sur ton ordinateur (`localhost`) et refuse les requêtes venant d'autres sites web ou
   d'autres noms d'hôte. Avec `--lan`, un code secret aléatoire est exigé.
 - Les changements passent par les commandes officielles d'Android (`pm disable-user`, `appops`, `settings`…), jamais root.
-- Le journal et une photo de l'état d'origine de la télé sont dans `data/`, à côté du programme.
+- Le journal et une photo de l'état d'origine de la télé sont dans `~/.zen-control` (`%APPDATA%\zen-control` sous Windows) : ils survivent aux mises à jour.
 - Les données de l'assistant ne sont lisibles que via adb (permission `DUMP`, réservée à adb et au système).
 
 ## Développeurs

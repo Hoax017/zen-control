@@ -42,4 +42,5 @@ else
   "$BT/apksigner" sign --ks "$KS" --ks-pass pass:android --key-pass pass:android --out "$DIST/zen-tvhelper.apk" "$OUT/aligned.apk"
 fi
 rm -f "$DIST/zen-tvhelper.apk.idsig"
+printf '%s' "${ZEN_VERSION_CODE:-1}" > "$DIST/zen-tvhelper.version"
 echo "OK -> $(cd "$DIST" && pwd)/zen-tvhelper.apk"

@@ -4,7 +4,7 @@ const I18N = {
   fr: {
     'nav.apps': 'Applis', 'nav.remote': 'Télécommande', 'nav.privacy': 'Pubs & traceurs', 'nav.settings': 'Réglages',
     'nav.install': 'Installer un APK', 'nav.journal': 'Journal',
-    'tv.switch': 'Changer de télé', 'tv.none': 'Pas de télé', 'tv.pending': 'En attente d\'autorisation',
+    'tv.switch': 'Changer de télé', 'tv.unknown': 'Appareil Android, pas encore connecté', 'tv.none': 'Pas de télé', 'tv.pending': 'En attente d\'autorisation',
     'connect.title': 'Connecte ta télé', 'connect.intro': 'La télé et cet ordinateur doivent être sur le même réseau, avec le débogage activé sur la télé.',
     'connect.found': 'Télés trouvées sur le réseau', 'connect.rescan': 'Rechercher', 'connect.ip': 'Adresse IP de la télé',
     'connect.button': 'Se connecter', 'connect.scanning': 'Recherche en cours…', 'connect.none': 'Aucune télé trouvée automatiquement. Tape son adresse IP ci-dessous.',
@@ -56,7 +56,7 @@ const I18N = {
   },
   en: {
     'nav.apps': 'Apps', 'nav.remote': 'Remote', 'nav.privacy': 'Ads & trackers', 'nav.settings': 'Settings', 'nav.install': 'Install an APK', 'nav.journal': 'Journal',
-    'tv.switch': 'Switch TV', 'tv.none': 'No TV', 'tv.pending': 'Waiting for approval',
+    'tv.switch': 'Switch TV', 'tv.unknown': 'Android device, not connected yet', 'tv.none': 'No TV', 'tv.pending': 'Waiting for approval',
     'connect.title': 'Connect your TV', 'connect.intro': 'The TV and this computer must be on the same network, with debugging turned on on the TV.',
     'connect.found': 'TVs found on your network', 'connect.rescan': 'Search', 'connect.ip': 'TV IP address', 'connect.button': 'Connect',
     'connect.scanning': 'Searching…', 'connect.none': 'No TV found automatically. Type its IP address below.',
@@ -182,8 +182,8 @@ async function scanTvs() {
   try {
     const tvs = await api('/api/scan');
     if (!tvs.length) { list.innerHTML = `<div class="muted">${t('connect.none')}</div>`; return; }
-    list.innerHTML = tvs.map(tv => `<div class="tv"><div><strong>${esc(tv.name || tv.ip)}</strong>
-      <div class="state ${tv.state === 'pending' ? 'pending' : ''}">${esc(tv.ip)} · ${tv.state === 'ok' ? '✔' : esc(tv.state === 'pending' ? t('tv.pending') : tv.state)}</div></div>
+    list.innerHTML = tvs.map(tv => `<div class="tv"><div><strong>${esc(tv.name || 'Android TV ?')}</strong>
+      <div class="state ${tv.state === 'pending' ? 'pending' : ''}">${esc(tv.ip)} · ${tv.state === 'ok' ? '✔' : (tv.state === 'pending' ? t('tv.pending') : t('tv.unknown'))}</div></div>
       <button class="primary small" data-ip="${esc(tv.ip)}">${t('connect.button')}</button></div>`).join('');
     list.querySelectorAll('button').forEach(b => b.addEventListener('click', () => connect(b.dataset.ip)));
   } catch (e) { list.innerHTML = `<div class="muted">${esc(e.message)}</div>`; }

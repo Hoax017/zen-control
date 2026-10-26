@@ -14,7 +14,7 @@ for target in $TARGETS; do
   exe="zen-control"; [[ $os == windows-* ]] && exe="zen-control.exe"
   bun build server.js --compile --minify --target="$target" --outfile "$out/$exe"
   cp -R web known-apps.json LICENSE "$out/"
-  cp dist/zen-tvhelper.apk "$out/dist/"
+  cp dist/zen-tvhelper.apk dist/zen-tvhelper.version "$out/dist/"
   case "$os" in
     windows-*) printf '@echo off\r\ncd /d "%%~dp0"\r\nzen-control.exe\r\npause\r\n' > "$out/Zen Control.bat" ;;
     darwin-*) printf '#!/bin/bash\ncd "$(dirname "$0")"\nxattr -d com.apple.quarantine zen-control 2>/dev/null\n./zen-control\n' > "$out/Zen Control.command"; chmod +x "$out/Zen Control.command" ;;

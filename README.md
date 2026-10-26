@@ -30,8 +30,10 @@ components are locked.
 2. **Download** the zip for your computer from the [latest release](https://github.com/Hoax017/zen-control/releases/latest)
    and unzip it.
 3. **Run it**:
-   - **Windows**: double-click **`Zen Control.bat`** (if SmartScreen warns, *More info → Run anyway*).
-   - **Mac**: double-click **`Zen Control.command`** (first time: right-click → *Open*).
+   - **Windows**: double-click **`Zen Control.bat`** (if SmartScreen warns, *More info → Run anyway*). *Not yet tested on a real Windows PC — feedback welcome.*
+   - **Mac**: double-click **`Zen Control.command`**. The program isn't signed by Apple: the first time, macOS blocks it —
+     open *System Settings → Privacy & Security* and click **Open Anyway**, or run once in Terminal:
+     `xattr -dr com.apple.quarantine ~/Downloads/zen-control-darwin-*` (adapt the path).
    - **Linux**: `./zen-control`
 4. Your browser opens **http://localhost:8765**. Pick your TV, then **accept the window on the TV**
    (*Allow USB debugging?* → tick *Always allow*).
@@ -49,7 +51,7 @@ Run `zen-control --lan` (or `node server.js --lan`): it prints a link with a sec
 - The server only listens on your computer (`localhost`), refuses requests from other websites and from other
   host names. With `--lan`, a random secret code is required.
 - Changes go through Android's own commands (`pm disable-user`, `appops`, `settings`…), never root.
-- The journal and a snapshot of the TV's original state are stored in `data/` next to the program.
+- The journal and a snapshot of the TV's original state are stored in `~/.zen-control` (`%APPDATA%\zen-control` on Windows), so they survive updates.
 - The helper app's data can only be read through adb (it requires the `DUMP` permission that only adb and the
   system have).
 

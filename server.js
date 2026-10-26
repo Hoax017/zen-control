@@ -19,10 +19,14 @@ const here = fileURLToPath(import.meta.url);
 // Compiled with Bun, the script lives in a virtual file system: files ship next to the executable instead.
 const ROOT = process.env.ZEN_ROOT
   || (here.includes('$bunfs') || here.includes('~BUN') ? path.dirname(process.execPath) : path.dirname(here));
-const DATA = process.env.ZEN_DATA || path.join(ROOT, 'data');
+// Journal and original-state snapshots live in the user's folder, so they survive updates of the program.
+const DATA = process.env.ZEN_DATA || (process.platform === 'win32'
+  ? path.join(process.env.APPDATA || os.homedir(), 'zen-control')
+  : path.join(os.homedir(), '.zen-control'));
 const WEB = path.join(ROOT, 'web');
 const HELPER_APK = path.join(ROOT, 'dist', 'zen-tvhelper.apk');
 const HELPER_PKG = 'com.zen.tvhelper';
+const HELPER_VERSION = Number((() => { try { return fs.readFileSync(path.join(ROOT, 'dist', 'zen-tvhelper.version'), 'utf8'); } catch { return 0; } })());
 const ZEN_HOME = 'com.zen.tvhome';
 const KNOWN = JSON.parse(fs.readFileSync(path.join(ROOT, 'known-apps.json'), 'utf8'));
 const PROTECTED = new Set(KNOWN.protected);
@@ -31,6 +35,7 @@ const args = process.argv.slice(2);
 const PORT = Number(args.find(a => a.startsWith('--port='))?.slice(7) || process.env.PORT || 8765);
 const LAN = args.includes('--lan');
 const TOKEN = LAN ? crypto.randomBytes(12).toString('hex') : null;
+if (!fs.existsSync(DATA) && fs.existsSync(path.join(ROOT, 'data'))) fs.cpSync(path.join(ROOT, 'data'), DATA, { recursive: true });
 fs.mkdirSync(DATA, { recursive: true });
 
 // ---------------------------------------------------------------- adb
@@ -166,7 +171,11 @@ async function state() {
   if (!serial) return { adb: true, connected: false };
   const st = String((await adb(['get-state'])).stdout).trim();
   if (st !== 'device') return { adb: true, connected: false, serial, pending: /unauthorized/.test(st) };
-  return { adb: true, connected: true, serial, device: await deviceInfo(), helper: await hasPackage(HELPER_PKG), zenHome: await hasPackage(ZEN_HOME) };
+  let helper = await hasPackage(HELPER_PKG);
+  if (helper && HELPER_VERSION && await helperVersion() < HELPER_VERSION) {
+    await installHelper().catch(() => {});
+  }
+  return { adb: true, connected: true, serial, device: await deviceInfo(), helper, zenHome: await hasPackage(ZEN_HOME) };
 }
 
 async function connect(target) {
@@ -211,16 +220,19 @@ async function scan() {
   const found = [];
   await Promise.all(localPrefixes().flatMap(p => Array.from({ length: 254 }, (_, i) => `${p}.${i + 1}`))
     .map(async ip => { if (await probe(ip)) found.push(ip); }));
+  // Only devices adb already knows are queried for their name: connecting to the others would pop up the
+  // authorization window on every Android device of the house.
+  const known = String((await adbRaw(['devices'])).stdout);
   const out = [];
   for (const ip of found.sort((a, b) => Number(a.split('.')[3]) - Number(b.split('.')[3]))) {
-    await adbRaw(['connect', `${ip}:5555`]);
-    const st = String((await adbRaw(['-s', `${ip}:5555`, 'get-state'])).stdout).trim();
-    let name = st === 'device' ? '' : (/unauthorized/.test(st) ? 'pending' : 'offline');
+    const line = known.split('\n').find(l => l.startsWith(`${ip}:5555`));
+    const st = line ? line.split(/\s+/)[1] : 'unknown';
+    let name = '';
     if (st === 'device') {
       const p = String((await adbRaw(['-s', `${ip}:5555`, 'shell', 'getprop ro.product.manufacturer; getprop ro.product.model'])).stdout).replace(/\r/g, '').split('\n');
       name = `${p[0]} ${p[1]}`.trim();
     }
-    out.push({ ip, state: st === 'device' ? 'ok' : name, name });
+    out.push({ ip, state: st === 'device' ? 'ok' : (st === 'unauthorized' ? 'pending' : 'unknown'), name });
   }
   return out;
 }
@@ -229,9 +241,19 @@ async function scan() {
 
 async function installHelper() {
   if (!fs.existsSync(HELPER_APK)) throw httpError(500, 'helper APK missing (dist/zen-tvhelper.apk)');
-  const r = await adb(['install', '-r', HELPER_APK]);
+  let r = await adb(['install', '-r', HELPER_APK]);
+  if (/UPDATE_INCOMPATIBLE|INSTALL_FAILED_VERSION_DOWNGRADE/.test(r.stdout + r.stderr)) {
+    // Signed with another key (or newer): the helper keeps no data, so it is simply replaced.
+    await sh(`pm uninstall ${HELPER_PKG}`);
+    r = await adb(['install', HELPER_APK]);
+  }
   if (!/Success/.test(r.stdout)) throw httpError(500, `install failed: ${r.stdout}${r.stderr}`);
   await allowHelperStart();
+}
+
+async function helperVersion() {
+  const m = (await sh(`dumpsys package ${HELPER_PKG} | grep -m1 versionCode`)).match(/versionCode=(\d+)/);
+  return m ? Number(m[1]) : 0;
 }
 
 // TCL firmwares refuse to start apps that lack their APP_AUTO_START permission (unknown op elsewhere: ignored).
@@ -328,6 +350,10 @@ async function appAction(pkg, action) {
       out = await sh(`pm disable-user --user 0 ${pkg}`);
       if (!/disabled-user/.test(out)) throw httpError(500, out);
       if (was.enabled) record({ kind: 'package', pkg, action, before: 'enabled' });
+      // Some firmwares (TCL) re-enable these at every boot: suspending them too keeps them off.
+      if (KNOWN.apps[pkg]?.suspend && !was.suspended && /true/.test(await sh(`pm suspend --user 0 ${pkg}`))) {
+        record({ kind: 'suspend', pkg, action: 'suspend', before: false });
+      }
       break;
     case 'enable':
       out = await sh(`pm enable --user 0 ${pkg}`);
