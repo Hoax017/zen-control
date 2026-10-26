@@ -38,8 +38,9 @@ composants système essentiels sont verrouillés.
    **Mac, premier lancement** : l'app n'est pas signée par Apple, macOS la bloque une fois. Ouvre
    *Réglages Système → Confidentialité et sécurité* et clique **Ouvrir quand même** (ou, dans le Terminal :
    `xattr -dr com.apple.quarantine "/Applications/Zen Control.app"`).
-3. L'app n'a pas de fenêtre à elle : elle ouvre la page dans ton navigateur. Pour l'arrêter, bouton **Quitter Zen Control**
-   en bas à gauche de la page. Relancer l'app quand elle tourne déjà rouvre simplement la page.
+3. L'app n'a pas de fenêtre à elle : elle ouvre la page dans ton navigateur. Pour l'arrêter : bouton **Quitter Zen Control**
+   en bas à gauche de la page, ou ferme simplement l'onglet — l'app s'arrête toute seule au bout de 10 minutes.
+   Relancer l'app quand elle tourne déjà rouvre la page ; une nouvelle version remplace automatiquement l'ancienne.
 4. Ton navigateur s'ouvre sur **http://localhost:8765**. Choisis ta télé, puis **accepte la fenêtre sur la télé**
    (*Autoriser le débogage USB ?* → coche *Toujours autoriser*).
 5. Clique **Installer l'assistant** : une mini appli invisible qui permet d'afficher le nom et l'icône des applis.

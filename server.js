@@ -35,6 +35,11 @@ const KNOWN = JSON.parse(fs.readFileSync(path.join(ROOT, 'known-apps.json'), 'ut
 const PROTECTED = new Set(KNOWN.protected);
 
 const args = process.argv.slice(2);
+// Identifies this exact build: a newer copy of the app takes over from an older one still running.
+const BUILD_ID = process.env.ZEN_BUILD_ID || (() => { try { const st = fs.statSync(process.execPath); return `${st.size}-${Math.round(st.mtimeMs)}`; } catch { return 'dev'; } })();
+// The installed app has no window: it stops by itself once no page has talked to it for a while.
+const IDLE_EXIT_MS = Number(process.env.ZEN_IDLE_EXIT_MS || (compiled ? 10 * 60 * 1000 : 0));
+let lastSeen = Date.now();
 const PORT = Number(args.find(a => a.startsWith('--port='))?.slice(7) || process.env.PORT || 8765);
 const LAN = args.includes('--lan');
 const TOKEN = LAN ? crypto.randomBytes(12).toString('hex') : null;
@@ -673,6 +678,7 @@ const routes = {
   'POST /api/zenhome/install': async (req) => { needDevice(); return installZenHome(!!(await body(req)).force); },
   'POST /api/zenhome/open': async () => { needDevice(); await sh(`am start -n ${ZEN_HOME}/.HomeActivity`); return { ok: true }; },
   'POST /api/quit': async () => { setTimeout(() => process.exit(0), 300); return { ok: true }; },
+  'GET /api/build': () => ({ build: BUILD_ID }),
   'GET /api/device': async () => {
     needDevice();
     const [mem, df, up, ip] = await Promise.all([sh('cat /proc/meminfo'), sh('df -h /data | tail -1'), sh('cat /proc/uptime'), sh('ip -4 addr show wlan0 2>/dev/null; ip -4 addr show eth0 2>/dev/null')]);
@@ -710,6 +716,7 @@ const server = http.createServer(async (req, res) => {
     if (!authorized(req)) return send(res, 401, 'Open the link printed in the terminal (with ?t=…).', 'text/plain');
 
     if (url.pathname.startsWith('/api/')) {
+      lastSeen = Date.now();
       // A custom header can't be sent cross-site without CORS, which this server never allows: no CSRF.
       if (req.headers['x-zen'] !== '1') return send(res, 403, { error: 'missing header' });
       const iconMatch = url.pathname.match(/^\/api\/icon\/([A-Za-z0-9_.]+)$/);
@@ -760,10 +767,25 @@ function openBrowser(url) {
 }
 
 // Launched again while already running (e.g. the app icon clicked twice): just show the page.
-server.on('error', err => {
-  if (err.code === 'EADDRINUSE') { openBrowser(`http://localhost:${PORT}/`); setTimeout(() => process.exit(0), 500); }
-  else { console.error(err); process.exit(1); }
+// If the running copy is another build (an older version), it is asked to quit and this one takes over.
+let tookOver = false;
+server.on('error', async err => {
+  if (err.code !== 'EADDRINUSE') { console.error(err); process.exit(1); }
+  const base = `http://127.0.0.1:${PORT}`;
+  const other = await fetch(`${base}/api/build`, { headers: { 'x-zen': '1' } }).then(r => r.ok ? r.json() : {}).catch(() => ({}));
+  if (!tookOver && other.build !== BUILD_ID) {
+    tookOver = true;
+    await fetch(`${base}/api/quit`, { method: 'POST', headers: { 'x-zen': '1' } }).catch(() => {});
+    setTimeout(() => server.listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1'), 1200);
+    return;
+  }
+  openBrowser(`http://localhost:${PORT}/`);
+  setTimeout(() => process.exit(0), 500);
 });
+
+if (IDLE_EXIT_MS) {
+  setInterval(() => { if (Date.now() - lastSeen > IDLE_EXIT_MS) process.exit(0); }, 30000).unref();
+}
 
 server.listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1', () => {
   const local = `http://localhost:${PORT}/`;
