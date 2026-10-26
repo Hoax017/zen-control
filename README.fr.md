@@ -27,14 +27,19 @@ composants système essentiels sont verrouillés.
 
 1. **Sur la télé** (une seule fois) : *Paramètres → Système → À propos* → clique 7 fois sur *Build de l'OS Android TV* →
    reviens dans *Système → Options pour les développeurs* → active **Débogage USB** (et **Débogage réseau** s'il existe).
-2. **Télécharge** le zip de ton ordinateur depuis la [dernière version](https://github.com/Hoax017/zen-control/releases/latest)
-   et dézippe-le.
-3. **Lance-le** :
-   - **Windows** : double-clic sur **`Zen Control.bat`** (si SmartScreen prévient : *Informations complémentaires → Exécuter quand même*). *Pas encore testé sur un vrai PC Windows — retours bienvenus.*
-   - **Mac** : double-clic sur **`Zen Control.command`**. Le programme n'est pas signé par Apple : la première fois, macOS le bloque —
-     ouvre *Réglages Système → Confidentialité et sécurité* et clique **Ouvrir quand même**, ou lance une fois dans le Terminal :
-     `xattr -dr com.apple.quarantine ~/Downloads/zen-control-darwin-*` (adapte le chemin).
-   - **Linux** : `./zen-control`
+2. **Installe-le** depuis la [dernière version](https://github.com/Hoax017/zen-control/releases/latest) :
+
+   | Ton ordinateur | Fichier à télécharger | Installation |
+   |---|---|---|
+   | **Mac** (Apple ou Intel) | `ZenControl.dmg` | Ouvre-le et glisse **Zen Control** dans **Applications**. Lance-le ensuite depuis le Launchpad ou Spotlight. |
+   | **Windows** | `zen-control-windows-x64.zip` | Dézippe, puis double-clic sur **`Zen Control.bat`** (si SmartScreen prévient : *Informations complémentaires → Exécuter quand même*). *Pas encore testé sur un vrai PC — retours bienvenus.* |
+   | **Linux** | `zen-control-linux-x64.zip` (ou `-arm64`) | Dézippe, puis `./zen-control` |
+
+   **Mac, premier lancement** : l'app n'est pas signée par Apple, macOS la bloque une fois. Ouvre
+   *Réglages Système → Confidentialité et sécurité* et clique **Ouvrir quand même** (ou, dans le Terminal :
+   `xattr -dr com.apple.quarantine "/Applications/Zen Control.app"`).
+3. L'app n'a pas de fenêtre à elle : elle ouvre la page dans ton navigateur. Pour l'arrêter, bouton **Quitter Zen Control**
+   en bas à gauche de la page. Relancer l'app quand elle tourne déjà rouvre simplement la page.
 4. Ton navigateur s'ouvre sur **http://localhost:8765**. Choisis ta télé, puis **accepte la fenêtre sur la télé**
    (*Autoriser le débogage USB ?* → coche *Toujours autoriser*).
 5. Clique **Installer l'assistant** : une mini appli invisible qui permet d'afficher le nom et l'icône des applis.

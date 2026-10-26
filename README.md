@@ -27,14 +27,19 @@ components are locked.
 
 1. **On the TV** (one time): *Settings → System → About* → click *Android TV OS build* 7 times →
    back to *System → Developer options* → turn on **USB debugging** (and **Network debugging** if present).
-2. **Download** the zip for your computer from the [latest release](https://github.com/Hoax017/zen-control/releases/latest)
-   and unzip it.
-3. **Run it**:
-   - **Windows**: double-click **`Zen Control.bat`** (if SmartScreen warns, *More info → Run anyway*). *Not yet tested on a real Windows PC — feedback welcome.*
-   - **Mac**: double-click **`Zen Control.command`**. The program isn't signed by Apple: the first time, macOS blocks it —
-     open *System Settings → Privacy & Security* and click **Open Anyway**, or run once in Terminal:
-     `xattr -dr com.apple.quarantine ~/Downloads/zen-control-darwin-*` (adapt the path).
-   - **Linux**: `./zen-control`
+2. **Install it** from the [latest release](https://github.com/Hoax017/zen-control/releases/latest):
+
+   | Your computer | File to download | Install |
+   |---|---|---|
+   | **Mac** (Apple or Intel) | `ZenControl.dmg` | Open it and drag **Zen Control** into **Applications**. Then launch it from Launchpad or Spotlight. |
+   | **Windows** | `zen-control-windows-x64.zip` | Unzip, then double-click **`Zen Control.bat`** (if SmartScreen warns, *More info → Run anyway*). *Not yet tested on a real PC — feedback welcome.* |
+   | **Linux** | `zen-control-linux-x64.zip` (or `-arm64`) | Unzip, then `./zen-control` |
+
+   **Mac, first launch**: the app isn't signed by Apple, so macOS blocks it once. Open
+   *System Settings → Privacy & Security* and click **Open Anyway** (or in Terminal:
+   `xattr -dr com.apple.quarantine "/Applications/Zen Control.app"`).
+3. The app has no window of its own: it opens the page in your browser. To stop it, use **Quit Zen Control**
+   at the bottom left of the page. Launching it again while it runs just reopens the page.
 4. Your browser opens **http://localhost:8765**. Pick your TV, then **accept the window on the TV**
    (*Allow USB debugging?* → tick *Always allow*).
 5. Click **Install helper**: a tiny invisible app that lets Zen Control show app names and icons.
