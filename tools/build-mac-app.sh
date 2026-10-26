@@ -46,5 +46,10 @@ PLIST
 # Ad-hoc signature: required to run on Apple Silicon (not a notarized Developer ID signature).
 codesign --force --deep --sign - "$APP"
 ln -s /Applications "$STAGE/Applications"
-hdiutil create -quiet -volname "Zen Control" -srcfolder "$STAGE" -ov -format UDZO dist/ZenControl.dmg
+# hdiutil sometimes fails with "Resource busy" on CI machines: retry a few times.
+for attempt in 1 2 3 4 5; do
+  hdiutil create -volname "Zen Control" -srcfolder "$STAGE" -ov -format UDZO dist/ZenControl.dmg && break
+  [ "$attempt" = 5 ] && exit 1
+  sleep $((attempt * 5))
+done
 echo "OK -> dist/ZenControl.dmg"
