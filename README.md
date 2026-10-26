@@ -38,9 +38,9 @@ components are locked.
    **Mac, first launch**: the app isn't signed by Apple, so macOS blocks it once. Open
    *System Settings → Privacy & Security* and click **Open Anyway** (or in Terminal:
    `xattr -dr com.apple.quarantine "/Applications/Zen Control.app"`).
-3. The app has no window of its own: it opens the page in your browser. To stop it: **Quit Zen Control**
-   at the bottom left of the page, or just close the tab — the app stops by itself after 10 minutes.
-   Launching it again while it runs reopens the page; a newer version automatically replaces the older one.
+3. On Mac, Zen Control has its icon in the Dock and opens its page in your browser. Click the Dock icon to reopen
+   the page; quit it like any app (**⌘Q**, right-click the icon → Quit, or the page's **Quit Zen Control** button).
+   On Windows and Linux: the page's **Quit** button, or close the tab — the program stops by itself after 10 minutes.
 4. Your browser opens **http://localhost:8765**. Pick your TV, then **accept the window on the TV**
    (*Allow USB debugging?* → tick *Always allow*).
 5. Click **Install helper**: a tiny invisible app that lets Zen Control show app names and icons.

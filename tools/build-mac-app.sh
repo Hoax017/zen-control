@@ -20,6 +20,11 @@ rm -rf "$STAGE" dist/ZenControl.dmg
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/dist"
 lipo -create "$ARM" "$X64" -output "$APP/Contents/MacOS/zen-control"
 chmod +x "$APP/Contents/MacOS/zen-control"
+# Native launcher: Dock icon, menu and ⌘Q; it runs the server above and stops it on quit.
+swiftc -O -target arm64-apple-macos11 mac/ZenControlApp.swift -o dist/launcher-arm64
+swiftc -O -target x86_64-apple-macos11 mac/ZenControlApp.swift -o dist/launcher-x64
+lipo -create dist/launcher-arm64 dist/launcher-x64 -output "$APP/Contents/MacOS/Zen Control"
+rm -f dist/launcher-arm64 dist/launcher-x64
 cp -R web known-apps.json LICENSE "$APP/Contents/Resources/"
 cp dist/zen-tvhelper.apk dist/zen-tvhelper.version "$APP/Contents/Resources/dist/"
 cp mac/ZenControl.icns "$APP/Contents/Resources/"
@@ -31,14 +36,13 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleName</key><string>Zen Control</string>
   <key>CFBundleDisplayName</key><string>Zen Control</string>
   <key>CFBundleIdentifier</key><string>io.github.hoax017.zencontrol</string>
-  <key>CFBundleExecutable</key><string>zen-control</string>
+  <key>CFBundleExecutable</key><string>Zen Control</string>
   <key>CFBundleIconFile</key><string>ZenControl</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundleVersion</key><string>$VERSION</string>
   <key>LSMinimumSystemVersion</key><string>11.0</string>
-  <!-- No Dock icon: the app is a small server, its window is the browser page. -->
-  <key>LSUIElement</key><true/>
+  <key>NSHighResolutionCapable</key><true/>
   <key>NSHumanReadableCopyright</key><string>MIT — Hoax017</string>
 </dict>
 </plist>

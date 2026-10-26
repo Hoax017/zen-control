@@ -38,7 +38,7 @@ const args = process.argv.slice(2);
 // Identifies this exact build: a newer copy of the app takes over from an older one still running.
 const BUILD_ID = process.env.ZEN_BUILD_ID || (() => { try { const st = fs.statSync(process.execPath); return `${st.size}-${Math.round(st.mtimeMs)}`; } catch { return 'dev'; } })();
 // The installed app has no window: it stops by itself once no page has talked to it for a while.
-const IDLE_EXIT_MS = Number(process.env.ZEN_IDLE_EXIT_MS || (compiled ? 10 * 60 * 1000 : 0));
+const IDLE_EXIT_MS = Number(process.env.ZEN_IDLE_EXIT_MS || (compiled && !process.env.ZEN_APP ? 10 * 60 * 1000 : 0));
 let lastSeen = Date.now();
 const PORT = Number(args.find(a => a.startsWith('--port='))?.slice(7) || process.env.PORT || 8765);
 const LAN = args.includes('--lan');
