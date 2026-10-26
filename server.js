@@ -17,8 +17,11 @@ import { fileURLToPath } from 'node:url';
 
 const here = fileURLToPath(import.meta.url);
 // Compiled with Bun, the script lives in a virtual file system: files ship next to the executable instead.
+const compiled = here.includes('$bunfs') || here.includes('~BUN');
+const exeDir = path.dirname(process.execPath);
+// Inside "Zen Control.app" the program sits in Contents/MacOS and its files in Contents/Resources.
 const ROOT = process.env.ZEN_ROOT
-  || (here.includes('$bunfs') || here.includes('~BUN') ? path.dirname(process.execPath) : path.dirname(here));
+  || (compiled ? (exeDir.endsWith(path.join('Contents', 'MacOS')) ? path.join(exeDir, '..', 'Resources') : exeDir) : path.dirname(here));
 // Journal and original-state snapshots live in the user's folder, so they survive updates of the program.
 const DATA = process.env.ZEN_DATA || (process.platform === 'win32'
   ? path.join(process.env.APPDATA || os.homedir(), 'zen-control')
@@ -47,13 +50,15 @@ function findAdb() {
   const exe = process.platform === 'win32' ? 'adb.exe' : 'adb';
   const candidates = [
     process.env.ADB,
+    path.join(DATA, 'tools', 'platform-tools', exe),
     path.join(ROOT, 'tools', 'platform-tools', exe),
     path.join(os.homedir(), 'Library', 'Android', 'sdk', 'platform-tools', exe),
     path.join(os.homedir(), 'Android', 'Sdk', 'platform-tools', exe),
     process.env.LOCALAPPDATA && path.join(process.env.LOCALAPPDATA, 'Android', 'Sdk', 'platform-tools', exe),
   ];
   for (const c of candidates) if (c && fs.existsSync(c)) return c;
-  for (const dir of (process.env.PATH || '').split(path.delimiter)) {
+  // Apps started from the Finder get a minimal PATH: also look where Homebrew installs adb.
+  for (const dir of [...(process.env.PATH || '').split(path.delimiter), '/opt/homebrew/bin', '/usr/local/bin']) {
     const c = path.join(dir, exe);
     if (dir && fs.existsSync(c)) return c;
   }
@@ -85,7 +90,7 @@ async function downloadAdb() {
   const plat = { darwin: 'darwin', linux: 'linux', win32: 'windows' }[process.platform];
   if (!plat) throw new Error('unsupported platform');
   const url = `https://dl.google.com/android/repository/platform-tools-latest-${plat}.zip`;
-  const dir = path.join(ROOT, 'tools');
+  const dir = path.join(DATA, 'tools');
   fs.mkdirSync(dir, { recursive: true });
   const zip = path.join(dir, 'platform-tools.zip');
   const res = await fetch(url);
@@ -634,6 +639,7 @@ const routes = {
   'GET /api/screen': async () => { needDevice(); const png = await screenshot(); if (!png) throw httpError(503, 'no screenshot'); return { __raw: png, type: 'image/png' }; },
   'POST /api/install': async (req) => { needDevice(); return installApk(req); },
   'POST /api/reboot': async () => { needDevice(); await adb(['reboot']); return { ok: true }; },
+  'POST /api/quit': async () => { setTimeout(() => process.exit(0), 300); return { ok: true }; },
   'GET /api/device': async () => {
     needDevice();
     const [mem, df, up, ip] = await Promise.all([sh('cat /proc/meminfo'), sh('df -h /data | tail -1'), sh('cat /proc/uptime'), sh('ip -4 addr show wlan0 2>/dev/null; ip -4 addr show eth0 2>/dev/null')]);
@@ -714,6 +720,18 @@ ADB = findAdb();
 const last = readJson(path.join(DATA, 'last.json'), null);
 if (ADB && last?.serial) connect(last.serial).catch(() => {});
 
+function openBrowser(url) {
+  if (process.env.ZEN_NO_BROWSER || args.includes('--no-browser')) return;
+  const cmd = process.platform === 'darwin' ? ['open', [url]] : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]] : ['xdg-open', [url]];
+  try { spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true }).unref(); } catch {}
+}
+
+// Launched again while already running (e.g. the app icon clicked twice): just show the page.
+server.on('error', err => {
+  if (err.code === 'EADDRINUSE') { openBrowser(`http://localhost:${PORT}/`); setTimeout(() => process.exit(0), 500); }
+  else { console.error(err); process.exit(1); }
+});
+
 server.listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1', () => {
   const local = `http://localhost:${PORT}/`;
   console.log(`\n  Zen Control is running → ${local}`);
@@ -723,9 +741,5 @@ server.listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1', () => {
     console.log(`  On this computer → ${local}?t=${TOKEN}`);
   }
   console.log('  Leave this window open while you use it. Ctrl+C to stop.\n');
-  if (!process.env.ZEN_NO_BROWSER && !args.includes('--no-browser')) {
-    const url = LAN ? `${local}?t=${TOKEN}` : local;
-    const cmd = process.platform === 'darwin' ? ['open', [url]] : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]] : ['xdg-open', [url]];
-    try { spawn(cmd[0], cmd[1], { stdio: 'ignore', detached: true }).unref(); } catch {}
-  }
+  openBrowser(LAN ? `${local}?t=${TOKEN}` : local);
 });
